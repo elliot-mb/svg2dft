@@ -16,7 +16,7 @@ const SCALE = 800;
 const OFFSET = new Complex(500, 500);
 const COLOURS = ["#f00", "#0f0", "#00f", "#ff0", "#0ff", "#f0f"];
 const ARROW_COUNT = 500;
-const POINTS = 200;
+const POINTS = 100;
 
 let dt, pt;
 let trailQueue = Array(TRAIL_SIZE).fill(new Complex());
@@ -26,11 +26,39 @@ const pts = new Points(POINTS);
 let sines, arrows;
 
 const state = new State(SCALE, OFFSET, (transform) => {
-    pts.generate();
+    // pts.generate();
+    // pts.transform(transform);
+    // pts.transform({ 
+    //     scale: new Complex(1, 0),
+    //     translate: OFFSET.mul(new Complex(-0.5, 0))
+    // });
+    // const transformedPoints = pts.getPoints();
+    // sines = new Sines(DFT.apply(transformedPoints));
+    // console.log(pts);
+    
+    // console.log(sines);
 
-    console.log(pts);
+    // pts.transform(
+    //     { 
+    //         scale: new Complex(1, 0),
+    //         translate: OFFSET.mul(new Complex(0.5, 0))
+    //     }
+    // )
+
+
+    pts.generate();
+    pts.transform(transform);
+    pts.transform({
+        scale: new Complex(1, 0), 
+        translate: new Complex(-1 * OFFSET.re, -1 * OFFSET.im)
+    });
+
     sines = new Sines(DFT.apply(pts.getPoints()));
-    console.log(sines);
+
+    pts.transform({
+        scale: new Complex(1, 0),
+        translate: new Complex(OFFSET.re, OFFSET.im)
+    });
 
     trailNeedsReset = true;
 });
@@ -76,15 +104,15 @@ function drawArrows(arrows, drawPoint){
     }
     ctx.stroke();
 
-    // ctx.fillStyle = "#00f";
-    // ctx.beginPath();
-    // ctx.arc(drawPoint.re, drawPoint.im, 3, 0, 2 * Math.PI);
-    // ctx.fill(); 
-    // ctx.strokeStyle = "#00f";
-    // ctx.beginPath();
-    // ctx.lineWidth = 3;
-    // ctx.rect(drawPoint.re - 20, drawPoint.im - 20, 40, 40);
-    // ctx.stroke(); 
+    ctx.fillStyle = "#00f";
+    ctx.beginPath();
+    ctx.arc(drawPoint.re, drawPoint.im, 3, 0, 2 * Math.PI);
+    ctx.fill(); 
+    ctx.strokeStyle = "#00f";
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    ctx.rect(drawPoint.re - 20, drawPoint.im - 20, 40, 40);
+    ctx.stroke(); 
 }
 
 function mainLoop(timestamp){
@@ -95,26 +123,18 @@ function mainLoop(timestamp){
     ctx.fillStyle = "#000";
     ctx.fillRect(0,0,1000,1000);
 
+    // pts.getPoints().map((pt) => {
+    //     ctx.fillStyle = "#131";
+    //     ctx.fillRect(pt.re - 4, pt.im - 4, 8, 8);
+    // });
+
+    ctx.strokeStyle = "#311";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
     pts.getPoints().map((pt) => {
-        ctx.fillStyle = "#252";
-        const tPt = Points.transformPoint(pt, state.transform);
-        ctx.fillRect(tPt.re - 4, tPt.im - 4, 8, 8);
+        ctx.lineTo(pt.re, pt.im);
     });
-
-
-    if(pts.isLoaded()){
-        //let colour = 0;
-        ctx.strokeStyle = COLOURS[0];
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        // let unevenCount = 0;
-        const points = pts.getPoints();
-        for(let i = 0; i <= points.length; i++){
-            const pt = Points.transformPoint(points[i % points.length], state.transform);
-            ctx.lineTo(pt.re, pt.im);
-        }
-        ctx.stroke();
-    }
+    ctx.stroke();
 
     if(pts.isLoaded()){
         const timestep = dt / SUBSTEP;
@@ -123,23 +143,17 @@ function mainLoop(timestamp){
             trailNeedsReset = false;
         }
 
-        const drawPoint = new Complex(sines.finalPos.re, sines.finalPos.im);
-
+        let drawPoint = OFFSET;
+        
         for(let i = 0; i < SUBSTEP; i++){
             const tt = timestep * i;
-            arrows = sines.getArrows(timestamp + tt).map(a => Points.transformPoint(a, state.transform));
+            arrows = sines.getArrows(timestamp + tt);
+            drawPoint = sines.finalPos.add(OFFSET);
             trailQueue.shift();
-            trailQueue.push(drawPoint.add(OFFSET));
+            trailQueue.push(drawPoint);
         }
-        //console.log(arrows);
-        drawArrows(arrows, drawPoint.add(OFFSET));
-        //console.log(arrowsX);
-        // const lastPtX = lastArrowX.dst.re;
-        // const lastPtY = lastArrowX.dst.im;
-        // const finalPoint = new Point(lastPtX, lastPtY);
-        // ctx.fillStyle = "#fff";
-        // ctx.fillRect(finalPoint.re - 4, finalPoint.im + 496, 8, 8);
-        //console.log(finalPoint);
+
+        drawArrows(arrows, drawPoint);
     }
         
     // ctx.fillStyle = 'black';

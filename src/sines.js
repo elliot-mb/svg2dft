@@ -1,7 +1,8 @@
 import {Complex} from "./complex.js";
+import {DFT} from "./dft.js";
 
 export class Sines{
-    constructor(fSpace, arrowType){
+    constructor(fSpace){
         this.fSpace = fSpace;
         this.finalPos = new Complex();
     }
@@ -16,10 +17,10 @@ export class Sines{
         const arrows = [];
         let finalPos = new Complex();
 
-        this.fSpace.map((c, u) => { // u is our frequency
+        this.fSpace.map((c, k) => { 
             const mag = c.abs();
             const phs = c.arg();
-            
+            const u = DFT.frequency(k + 1);
             const tht = (t * u) + phs; // our phase angle
             const x = mag * Math.cos(tht);
             const y = mag * Math.sin(tht);

@@ -43,6 +43,11 @@ export class Complex{
         return new Complex(this.re / re, this.im / re);
     }   
 
+    //returns string representation
+    see(){
+        return `${this.re} + ${this.im}i`
+    }
+
     // e^(a + b * i) = e^a * e^(b * i)
     static exp(c){
         Complex.assertDefined(c);

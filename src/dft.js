@@ -12,13 +12,10 @@ export class DFT {
         return xs;
     }
 
-    //low-pass filter on all frequencies above n/2 for n length fSpace
-    static nyquistFilter(fSpace){
-        fSpace.splice(Math.floor(fSpace.length / 2));
-        for(let i = 1; i < fSpace.length; i++){
-            fSpace[i] = fSpace[i].mul(new Complex(2, 0));
-        }
-        return fSpace;
+    static frequency(k){
+        const sign = k % 2 === 0 ? -1 : 1;
+        const u = sign * Math.floor(k / 2);
+        return u;
     }
 
     //a signal is an array of complex values
@@ -28,17 +25,19 @@ export class DFT {
         const N = signal.length;
         const fSpace = []; //array of complex numbers as the fourier space
 
-        for(let u = 0; u < N; u++) {
-            let sum = new Complex();
-            signal.forEach((pt, x) => {
-                const radians = (Complex.TWO_PI * -1 * u * x) / N;
-                const c = Complex.exp(new Complex(0, radians));
-                sum = sum.add(c.mul(pt));
-            });
+        for(let k = 0; k < N; k++) {
+            let sum = new Complex(0, 0);
+            const u = DFT.frequency(k + 1);
+            for(let x = 0; x < N; x++){
+                const phi = -1 * (Complex.TWO_PI * u * x) / N;
+                const c = Complex.exp(new Complex(0, phi));
+                sum = sum.add(signal[x].mul(c));
+            }
+            console.log(`${u} responds ${sum.see()}`);
             fSpace.push(sum.div(N));
         }
 
-        return DFT.nyquistFilter(fSpace);
+        return fSpace;
     }
 
 }

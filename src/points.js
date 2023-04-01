@@ -98,7 +98,7 @@ export class Points {
     }
 
     isLoaded(){
-        return this.points !== undefined && this.points.length !== 0 && this.components !== undefined && this.components.length !== 0; 
+        return this.points !== undefined && this.points.length !== 0; 
     }
 }
 
