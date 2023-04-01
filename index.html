@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- boilerplate code -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>template</title>
+
+    <!-- links in css -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="src/main.js" type="module"></script>
+</head>
+<body>
+    <div id="centre-absolute">
+        <div class="container">
+            <canvas id="canvas" width="1000" height="1000"></canvas>
+        </div>
+        <div class="content">
+            <h1 class="hero">Drawrier</h1>
+            <span id="upload" onclick="document.getElementById('file-input').click()">Upload file</span>
+            <input id="file-input" type="file" name="name" style="display: none;" />
+            <span id="selected">Please upload a SVG file</span>
+        </div>
+    </div>
+</body>
+</html>
