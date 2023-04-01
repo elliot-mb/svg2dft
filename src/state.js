@@ -1,3 +1,5 @@
+import {Complex} from "./complex.js";
+
 export class State{
 
     constructor(size, loc, hook){
@@ -67,9 +69,8 @@ export class State{
                 const diffY = this.size - (this.bBox.h * scaleFact);
   
                 this.transform =  {
-                    scale: scaleFact,
-                    translate: {x: this.loc.x - (this.size/2) + (diffX / 2), 
-                                y: this.loc.y - (this.size/2) + (diffY / 2) }
+                    scale: new Complex(scaleFact, 0),
+                    translate: new Complex(this.loc.re - (this.size/2) + (diffX / 2), this.loc.im - (this.size/2) + (diffY / 2))
                 };
 
                 this.hook(this.transform);

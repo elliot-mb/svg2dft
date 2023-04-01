@@ -16,27 +16,27 @@ export class DFT {
     static nyquistFilter(fSpace){
         fSpace.splice(Math.floor(fSpace.length / 2));
         for(let i = 1; i < fSpace.length; i++){
-            fSpace[i] = fSpace[i].mul(2);
+            fSpace[i] = fSpace[i].mul(new Complex(2, 0));
         }
         return fSpace;
     }
 
-    //a signal is an array of real values
+    //a signal is an array of complex values
     static apply(signal){
         if(signal === undefined || signal.length === 0) throw Error("DFT.apply: seemingly empty or undefined signal");
 
         const N = signal.length;
         const fSpace = []; //array of complex numbers as the fourier space
-        const freqs = DFT.makeFreqs(N);
 
-        freqs.map((u) => {
+        for(let u = 0; u < N; u++) {
             let sum = new Complex();
             signal.forEach((pt, x) => {
                 const radians = (Complex.TWO_PI * -1 * u * x) / N;
-                sum = sum.add(Complex.exp(new Complex(0, radians)).mul(signal[x]));
+                const c = Complex.exp(new Complex(0, radians));
+                sum = sum.add(c.mul(pt));
             });
             fSpace.push(sum.div(N));
-        });
+        }
 
         return DFT.nyquistFilter(fSpace);
     }
