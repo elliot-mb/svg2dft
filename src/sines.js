@@ -1,10 +1,10 @@
-import { Point } from "./points.js";
+import {Complex} from "./complex.js";
+import {DFT} from "./dft.js";
 
 export class Sines{
-    constructor(fSpace, arrowType){
+    constructor(fSpace){
         this.fSpace = fSpace;
-        this.arrowType = arrowType;
-        this.finalPos = new Point();
+        this.finalPos = new Complex();
     }
 
     static SPEED = 0.0005;
@@ -15,43 +15,24 @@ export class Sines{
 
         const t = timestamp * Sines.SPEED;
         const arrows = [];
-        let finalPos = new Point();
-        this.fSpace.map((c, u) => { // u is our frequency
+        let finalPos = new Complex();
+
+        this.fSpace.map((c, k) => { 
             const mag = c.abs();
             const phs = c.arg();
-            
+            const u = DFT.frequency(k + 1);
             const tht = (t * u) + phs; // our phase angle
-            const x1 = (mag / 2) * Math.cos(tht);
-            const y1 = (mag / 2) * Math.sin(tht);
-            const dst1 = new Point(x1, y1);
+            const x = mag * Math.cos(tht);
+            const y = mag * Math.sin(tht);
+            const arrow = new Complex(x, y);
 
-            finalPos = finalPos.add(dst1);
+            finalPos = finalPos.add(arrow);
 
-            arrows.push(new this.arrowType(dst1.x, dst1.y));
-
-            const x2 = (mag / 2) * Math.cos(-tht);
-            const y2 = (mag / 2) * Math.sin(-tht);
-            const dst2 = new Point(x2, y2);
-
-            finalPos = finalPos.add(dst2);
-
-            arrows.push(new this.arrowType(dst2.x, dst2.y));
+            arrows.push(arrow);
         });
 
         this.finalPos = finalPos;
 
         return arrows;
-    }
-}
-
-export class XArrow extends Point {
-    constructor(x, y){
-        super(x, y);
-    }
-}
-
-export class YArrow extends Point{
-    constructor(x, y){
-        super(y, x);
     }
 }

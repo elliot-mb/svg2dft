@@ -11,6 +11,9 @@ export class Complex{
         if(c.re === undefined || c.im === undefined){
             throw Error("Complex.assertDefined: Undefined complex number");
         }
+        if(c.re === NaN || c.im === NaN){
+            throw Error("Complex.assertDefined: NaN complex number");
+        }
     }
 
     abs(){
@@ -26,19 +29,29 @@ export class Complex{
         return new Complex(this.re + c.re, this.im + c.im);
     }
 
-    mul(re){
-        return new Complex(this.re * re, this.im * re);
+    sub(c){
+        Complex.assertDefined(c);
+        return this.add(c.mul(new Complex(-1, 0)));
+    }
+
+    mul(c){
+        Complex.assertDefined(c);
+        return new Complex((this.re * c.re) - (this.im * c.im), (this.re * c.im) + (this.im * c.re));
     }
 
     div(re){
         return new Complex(this.re / re, this.im / re);
     }   
 
-    // e^(0 + i * im)
-    static exp(c){
-        if(c.re !== 0) throw Error("Complex.euler: No implementation for complex exponentiation!");
-        Complex.assertDefined(c);
+    //returns string representation
+    see(){
+        return `${this.re} + ${this.im}i`
+    }
 
-        return new Complex(Math.cos(c.im), Math.sin(c.im));
+    // e^(a + b * i) = e^a * e^(b * i)
+    static exp(c){
+        Complex.assertDefined(c);
+        const scalar = Math.exp(c.re);
+        return new Complex(scalar * Math.cos(c.im), scalar * Math.sin(c.im));
     }
 }
