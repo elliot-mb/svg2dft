@@ -1,8 +1,11 @@
 import {Complex} from "./complex.js";
+import {UI, UIHooks} from "./ui.js";
 
 export class State{
 
-    constructor(size, loc, hook){
+    constructor(size, loc, hook, uiHooks){
+        this.ui = new UI(uiHooks);
+
         this.file = null;
         this.fileText = null;
         this.selected = document.getElementById("selected");

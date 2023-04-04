@@ -2,18 +2,21 @@ import {Complex} from "./complex.js";
 import {DFT} from "./dft.js";
 
 export class Sines{
-    constructor(fSpace){
+
+    static DEFAULT_PERCENTAGE = 20;
+    static SPEED_SCALAR = 0.000025;
+
+    constructor(fSpace, percentage){
         this.fSpace = fSpace;
         this.finalPos = new Complex();
+        this.speed = percentage * Sines.SPEED_SCALAR;
     }
-
-    static SPEED = 0.0005;
 
     //an arrow is a source and a destination
     getArrows(timestamp){
         if(timestamp === undefined) throw Error("Sines.getArrows: timestamp cannot be undefined");
 
-        const t = timestamp * Sines.SPEED;
+        const t = timestamp * this.speed;
         const arrows = [];
         let finalPos = new Complex();
 
