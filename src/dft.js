@@ -33,7 +33,6 @@ export class DFT {
                 const c = Complex.exp(new Complex(0, phi));
                 sum = sum.add(signal[x].mul(c));
             }
-            console.log(`${u} responds ${sum.see()}`);
             fSpace.push(sum.div(N));
         }
 

@@ -128,7 +128,7 @@ function mainLoop(timestamp){
     //     ctx.fillRect(pt.re - 4, pt.im - 4, 8, 8);
     // });
 
-    ctx.strokeStyle = "#311";
+    ctx.strokeStyle = "#511";
     ctx.lineWidth = 2;
     ctx.beginPath();
     pts.getPoints().map((pt) => {
@@ -139,11 +139,12 @@ function mainLoop(timestamp){
     if(pts.isLoaded()){
         const timestep = dt / SUBSTEP;
         if(trailNeedsReset){
-            trailQueue = Array(TRAIL_SIZE).fill(OFFSET);
+            arrows = sines.getArrows(timestamp);
+            trailQueue = Array(TRAIL_SIZE).fill(sines.finalPos.add(OFFSET));
             trailNeedsReset = false;
         }
 
-        let drawPoint = OFFSET;
+        let drawPoint;
         
         for(let i = 0; i < SUBSTEP; i++){
             const tt = timestep * i;

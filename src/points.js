@@ -30,14 +30,12 @@ export class Points {
         
         
         // we will check if a distance is notably larger than this to determine where discontinuities occur
-        console.log(paths);
         Array.from(paths).map((path) => {
             const pathLength = path.getTotalLength();
             const proportion = pathLength / totalLength;
             for(let i = 0; i < this.count * proportion; i++){
                 const len = i * ratio;
                 let svgPt = path.getPointAtLength(len);
-                console.log(svgPt);
                 const pt = new Complex(svgPt.x, svgPt.y);
 
                 this.points.push(pt);
@@ -67,7 +65,6 @@ export class Points {
 
         // console.log(this.unevens);
         // console.log(this.components);
-        console.log(this.points);
     }
 
     //mutates points
