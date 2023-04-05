@@ -38,5 +38,7 @@ export class Sines{
         return arrows;
     }
 
+    getFinalPos(){ return this.finalPos; }
+
     setSpeed(speed) { this.speed = speed; }
 }

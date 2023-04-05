@@ -3,7 +3,7 @@ import {UI, UIHooks} from "./ui.js";
 
 export class State{
 
-    constructor(scale, offset, hook){
+    constructor(makePointsHook, resetHook){
         this.file = null;
         this.fileText = null;
         this.selected = document.getElementById("selected");
@@ -12,11 +12,9 @@ export class State{
         this.svgBox = null;
         this.bBox = null;
         this.transform = null;
-        this.scale = scale;
-        this.offset = offset; //offsetation of the centre of the points
-
-        this.hook = hook; //function to run when file changes, is run during promise
+        this.makePointsHook = makePointsHook; //function to run when file changes, is run during promise
         // hook should take one argument (transform)
+        this.resetHook = resetHook;
     }
 
     //sets change function
@@ -62,24 +60,37 @@ export class State{
                     height = heightMatch[0];
                 }
 
-                this.bBox = { w: width, h: height };
+                this.bBox = { w: width, h: height };    
 
-                this.hook(this.getTransform());
+                this.resetHook(); //sets a new svg to default size
+                this.makePointsHook(this.getOriginTransform(), this);
             });
         }
     }
 
-    getTransform() {
-        const largestDim = Math.max(this.bBox.w, this.bBox.h);
-        const scaleFact = this.scale / largestDim;
-        const diffX = this.scale - (this.bBox.w * scaleFact);
-        const diffY = this.scale - (this.bBox.h * scaleFact);
-
-        return {
-            scale: new Complex(scaleFact, 0),
-            translate: new Complex(this.offset.re - (this.scale/2) + (diffX / 2), this.offset.im - (this.scale/2) + (diffY / 2))
+    getOriginTransform() {
+        return { //honestly make a transform object
+            scale: new Complex(1, 0),
+            translate: new Complex(this.bBox.w / 2, this.bBox.h / 2).mul(new Complex(-1, 0))
         }
     }
+
+    getScale(scalePx){
+        const largestDim = Math.max(this.bBox.w, this.bBox.h);
+        return scalePx / largestDim;
+    }
+
+    // getScreenTransform() {
+    //     const largestDim = Math.max(this.bBox.w, this.bBox.h);
+    //     const scaleFact = this.scale / largestDim;
+    //     const diffX = this.scale - (this.bBox.w * scaleFact);
+    //     const diffY = this.scale - (this.bBox.h * scaleFact);
+
+    //     return {
+    //         scale: new Complex(scaleFact, 0),
+    //         translate: new Complex(this.offset.re - (this.scale/2) + (diffX / 2), this.offset.im - (this.scale/2) + (diffY / 2))
+    //     }
+    // }
 
     isValid(){
         return this.file !== null && this.file.type === "image/svg+xml";
@@ -110,7 +121,4 @@ export class State{
     getSvg(){
         return this.svgBox.children[0];
     }
-
-    setScale(scale){ this.scale = scale; }
-    setOffset(offset) { this.offset = offset; }
 }

@@ -19,23 +19,21 @@ let drawingMustReset = false;
 let points = new Points(settings.getSines());
 let sines, arrows;
 
-const stateTransformHook = (transform) => {
-    const offset = settings.getOffset();
+const makePointsHook = (transform, state) => {
+
     points.generate();
     points.transform(transform);
-    points.transform({
-        scale: new Complex(1, 0), 
-        translate: new Complex(-1 * offset.re, -1 * offset.im)
-    });
 
     sines = new Sines(DFT.apply(points.getPoints()), settings.getPercentSpeed());
 
-    points.transform({
-        scale: new Complex(1, 0),
-        translate: new Complex(offset.re, offset.im)
-    });
-
     drawingMustReset = true;
+}
+
+//is run whenever load a new svg, and thats it! hooks onto image upload in state
+const resetHook = () => {
+    settings.reset();
+    const scale = state.getScale(Settings.DEFAULT_SCALE_PX); 
+    settings.setScale(scale);
 }
 
 //UIHooks object has all hooks for settings fields IN ORDER
@@ -43,7 +41,7 @@ const ui = new UI(new UIHooks(
     (sines) => { 
         settings.setSines(sines);
         points = new Points(sines); 
-        stateTransformHook(state.getTransform());
+        makePointsHook(state.getOriginTransform());
     },
     (percentSpeed) => {
         settings.setPercentSpeed(percentSpeed);
@@ -52,10 +50,33 @@ const ui = new UI(new UIHooks(
 
         drawingMustReset = true; //reset it so trail adjusts to speed dynamically
     },
-    (scale) => {
+    (scalePx) => {
+        const scale = state.getScale(scalePx); //relative to the svg size
         settings.setScale(scale);
-        state.setScale(scale);
-        stateTransformHook(state.getTransform());
+        trailQueue = trailQueue.map((pt) => pt
+            .sub(settings.getOffset())
+            .mul(new Complex(settings.getScale()/settings.getLastScale()))
+            .add(settings.getOffset())
+        );
+
+    },
+    (offsetXPx) => {
+        const offset = settings.getOffset();
+        const newOffset = new Complex(offsetXPx, offset.im);
+        trailQueue = trailQueue.map((pt) => pt
+            .sub(settings.getOffset())
+            .add(newOffset)
+        );
+        settings.setOffset(newOffset);
+    },
+    (offsetYPx) => {
+        const offset = settings.getOffset();
+        const newOffset = new Complex(offset.re, offsetYPx);
+        trailQueue = trailQueue.map((pt) => pt
+            .sub(settings.getOffset())
+            .add(newOffset)
+        );
+        settings.setOffset(newOffset);
     },
     (percentTrail) => {
         settings.setTrailProportion(percentTrail/100);
@@ -73,11 +94,11 @@ const ui = new UI(new UIHooks(
 
 ui.init();
 
-const state = new State(settings.getScale(), settings.getOffset(), stateTransformHook);
+const state = new State(makePointsHook, resetHook);
 
 state.init();
 
-function drawArrows(arrows, drawPoint){
+function drawArrows(arrows, finalPoint){
     const count = Math.min(arrows.length, settings.getArrowCount());
 
     ctx.strokeStyle = "#ee2";
@@ -88,41 +109,49 @@ function drawArrows(arrows, drawPoint){
     });
     ctx.stroke();
 
-    let pos = settings.getOffset();
+    //draws circles
+    let pos = new Complex();
     ctx.strokeStyle = "#aaa";
     ctx.lineWidth = 1;
     for(let i = 0; i < count; i++){
         const ar = arrows[i];
         const len = ar.abs();
         ctx.beginPath();
-        ctx.arc(pos.re, pos.im, len, 0, 2 * Math.PI);
+        const dispPos = toDisplay(pos);
+        ctx.arc(dispPos.re, dispPos.im, len * settings.getScale(), 0, 2 * Math.PI);
         ctx.stroke(); 
+
         pos = pos.add(ar);
     }
 
+    //draws spinny vectors
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 1;
     ctx.beginPath();
-
-    pos = settings.getOffset();
-    ctx.moveTo(pos.re, pos.im);
-
+    pos = new Complex();
     for(let i = 0; i < count; i++){
         const ar = arrows[i];
+        const dispPos = toDisplay(pos);
+        ctx.lineTo(dispPos.re, dispPos.im);
+
         pos = pos.add(ar);
-        ctx.lineTo(pos.re, pos.im);
     }
     ctx.stroke();
 
     ctx.fillStyle = "#00f";
     ctx.beginPath();
-    ctx.arc(drawPoint.re, drawPoint.im, 3, 0, 2 * Math.PI);
+    ctx.arc(finalPoint.re, finalPoint.im, 3, 0, 2 * Math.PI);
     ctx.fill(); 
     ctx.strokeStyle = "#00f";
     ctx.beginPath();
     ctx.lineWidth = 3;
-    ctx.rect(drawPoint.re - 20, drawPoint.im - 20, 40, 40);
+    ctx.rect(finalPoint.re - 20, finalPoint.im - 20, 40, 40);
     ctx.stroke(); 
+}
+
+//transforms coordinates around the origin into display space
+function toDisplay(point){
+    return point.mul(new Complex(settings.getScale())).add(settings.getOffset());
 }
 
 function mainLoop(timestamp){
@@ -142,7 +171,8 @@ function mainLoop(timestamp){
     ctx.lineWidth = 2;
     ctx.beginPath();
     points.getPoints().map((pt) => {
-        ctx.lineTo(pt.re, pt.im);
+        const dispPt = toDisplay(pt);
+        ctx.lineTo(dispPt.re, dispPt.im);
     });
     ctx.stroke();
 
@@ -150,22 +180,22 @@ function mainLoop(timestamp){
         const timestep = dt / settings.getSubsteps();
         if(drawingMustReset){
             arrows = sines.getArrows(timestamp);
-            trailQueue = Array(settings.getTrailSize()).fill(sines.finalPos.add(settings.getOffset()));
+            trailQueue = Array(settings.getTrailSize()).fill(toDisplay(sines.getFinalPos()));
 
             drawingMustReset = false;
         }
 
-        let drawPoint;
+        let finalPoint;
         
         for(let i = 0; i < settings.getSubsteps(); i++){
             const tt = timestep * i;
             arrows = sines.getArrows(timestamp + tt);
-            drawPoint = sines.finalPos.add(settings.getOffset());
+            finalPoint = sines.getFinalPos();
             trailQueue.shift();
-            trailQueue.push(drawPoint);
+            trailQueue.push(toDisplay(finalPoint));
         }
 
-        drawArrows(arrows, drawPoint);
+        drawArrows(arrows, toDisplay(finalPoint));
     }
 
     requestAnimationFrame(mainLoop);

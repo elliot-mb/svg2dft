@@ -5,7 +5,8 @@ export class Settings{
 
     static DEFAULT_TRAIL_PROPORTION = 1; 
     static DEFAULT_SUBSTEPS = 5; //must be 1 or more
-    static DEFAULT_SCALE = 800;
+    static DEFAULT_SCALE = 1;
+    static DEFAULT_SCALE_PX = 800;
     static DEFAULT_OFFSET = new Complex(500, 500);
     //static COLOURS = ["#f00", "#0f0", "#00f", "#ff0", "#0ff", "#f0f"];
     static DEFAULT_ARROW_COUNT = 500;
@@ -22,7 +23,24 @@ export class Settings{
         //all the parameters the user customises
         this.trailProportion = Settings.DEFAULT_TRAIL_PROPORTION;
         this.substeps = Settings.DEFAULT_SUBSTEPS;
-        this.scale = Settings.DEFAULT_SCALE;
+        this.scale = {
+            last: Settings.DEFAULT_SCALE,
+            curr: Settings.DEFAULT_SCALE
+        };
+        this.offset = Settings.DEFAULT_OFFSET;
+        this.arrowCount = Settings.DEFAULT_ARROW_COUNT;
+        this.sines = Settings.DEFAULT_SINES;
+        this.percentSpeed = Settings.DEFAULT_PERCENT_SPEED;
+        this.trailSize = Settings.DEFAULT_TRAIL_SIZE;
+    }
+
+    reset(){
+        this.trailProportion = Settings.DEFAULT_TRAIL_PROPORTION;
+        this.substeps = Settings.DEFAULT_SUBSTEPS;
+        this.scale = {
+            last: Settings.DEFAULT_SCALE,
+            curr: Settings.DEFAULT_SCALE
+        };
         this.offset = Settings.DEFAULT_OFFSET;
         this.arrowCount = Settings.DEFAULT_ARROW_COUNT;
         this.sines = Settings.DEFAULT_SINES;
@@ -32,7 +50,8 @@ export class Settings{
 
     getTrailProportion() { return this.trailProportion; }
     getSubsteps() { return this.substeps; }
-    getScale() { return this.scale; }
+    getLastScale() { return this.scale.last; } //does not need a set
+    getScale() { return this.scale.curr; }
     getOffset() { return this.offset; }
     getArrowCount() { return this.arrowCount; }
     getSines() { return this.sines; }
@@ -41,7 +60,10 @@ export class Settings{
 
     setTrailProportion(trailProportion) { this.trailProportion = trailProportion; }
     setSubsteps(substeps) { this.substeps = substeps; }
-    setScale(scale) { this.scale = scale; }
+    setScale(scale) { 
+        this.scale.last = this.scale.curr; 
+        this.scale.curr = scale;
+    }
     setOffset(offset) { this.offset = offset; }
     setArrowCount(arrowCount) {this.arrowCount = arrowCount; }
     setSines(sines) { this.sines = sines; }

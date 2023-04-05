@@ -28,7 +28,6 @@ export class Points {
         const totalLength = Array.from(paths).reduce((tot, p) => tot + p.getTotalLength(), 0);
         const ratio = totalLength / this.count;
         
-        
         // we will check if a distance is notably larger than this to determine where discontinuities occur
         Array.from(paths).map((path) => {
             const pathLength = path.getTotalLength();
