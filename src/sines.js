@@ -3,7 +3,6 @@ import {DFT} from "./dft.js";
 
 export class Sines{
 
-    static DEFAULT_PERCENTAGE = 20;
     static SPEED_SCALAR = 0.000025;
 
     constructor(fSpace, percentage){
@@ -38,4 +37,6 @@ export class Sines{
 
         return arrows;
     }
+
+    setSpeed(speed) { this.speed = speed; }
 }

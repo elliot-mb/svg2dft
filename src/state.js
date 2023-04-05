@@ -3,9 +3,7 @@ import {UI, UIHooks} from "./ui.js";
 
 export class State{
 
-    constructor(size, loc, hook, uiHooks){
-        this.ui = new UI(uiHooks);
-
+    constructor(size, loc, hook){
         this.file = null;
         this.fileText = null;
         this.selected = document.getElementById("selected");
