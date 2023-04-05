@@ -3,6 +3,8 @@ import {UI, UIHooks} from "./ui.js";
 
 export class State{
 
+    static DEFAULT_SVG_ID = "default-svg";
+
     constructor(makePointsHook, resetHook){
         this.file = null;
         this.fileText = null;
