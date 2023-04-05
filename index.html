@@ -10,6 +10,7 @@
     <!-- links in css -->
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script src="src/main.js" type="module"></script>
+    <script src="src/ui.js" type="module"></script>
 </head>
 <body>
     <div id="centre-absolute">
@@ -22,39 +23,71 @@
             <input id="file-input" type="file" name="name" style="display: none;" />
             <span id="selected">Please upload a SVG file</span>
         </div>
-    </div>
-    <div class="ui">
-        <div class="settings">
-            <div class="header">
-                <h2>Settings</h2>
-                <span id="close">x</span>
-            </div>
-            <h3>DFT</h3>
-            <p>
-                Please enter integer quantities for the following properties of the Discrete Fourier Transform:
-            </p>
-            <div class="entry">
-                <p>Sine terms:</p>
-                <div class="field-button">
-                    <input class="number" id="sine-input" type="text">
-                    <button class="update">update</button>
+        <div class="ui">
+            <div class="settings" style="display: none;" >
+                <div class="header">
+                    <h2>Settings</h2>
+                    <span id="close-settings">x</span>
+                </div>
+                <h3>DFT</h3>
+                <p>
+                    Please enter integer quantities for the following properties of the Discrete Fourier Transform:
+                </p>
+                <div class="entry">
+                    <p>Sine terms:</p>
+                    <div class="field-button">
+                        <input class="number" id="sine-input" type="number" min="1" max="5000" placeholder="1-5000" list="defaultSines" required>
+                        <button class="update">update</button>
+                    </div>
+                </div>
+                <h3>Drawing</h3>
+                <p>
+                    Please enter integer quantities for the following properties of the visualisation:
+                </p>
+                <div class="entry">
+                    <p>Speed:</p>
+                    <div class="field-button">
+                        <input class="number" id="speed-input" type="number" min="0" max="100" placeholder="0-100" list="defaultSpeeds" required>
+                        <button class="update">update</button>
+                    </div>
+                </div>
+                <div class="entry">
+                    <p>Trail substeps:</p>
+                    <div class="field-button">
+                        <input class="number" id="substep-input" type="number" min="1" max="20" placeholder="1-20" list="defaultSubsteps" required>
+                        <button class="update">update</button>
+                    </div>
                 </div>
             </div>
-            <h3>Drawing</h3>
-            <p>
-                Please enter integer quantities for the following properties of the visualisation:
-            </p>
-            <div class="entry">
-                <p>Speed:</p>
-                <div class="field-button">
-                    <input class="number" id="speed-input" type="text">
-                    <button class="update">update</button>
-                </div>
+            <div class="open">
+                <span id="open-settings">Open settings</span>
             </div>
         </div>
-        <div class="open">
-            <span>Open settings</span>
-        </div>
     </div>
+
+    <datalist id="defaultSines">
+        <option value="10"></option>
+        <option value="20"></option>
+        <option value="50"></option>
+        <option value="100"></option>
+        <option value="200"></option>
+        <option value="500"></option>
+    </datalist>
+
+    <datalist id="defaultSpeeds">
+        <option value="1"></option>
+        <option value="10"></option>
+        <option value="20"></option>
+        <option value="50"></option>
+        <option value="100"></option>
+    </datalist>
+
+    <datalist id="defaultSubsteps">
+        <option value="1"></option>
+        <option value="2"></option>
+        <option value="5"></option>
+        <option value="10"></option>
+    </datalist>
+
 </body>
 </html>

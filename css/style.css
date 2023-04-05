@@ -1,6 +1,6 @@
 
 html, body{
-    background-color: #aaa;
+    background-color: #222;
     color: #ffffff;
     width: 100%;
     height: 100%;
@@ -27,10 +27,9 @@ a:hover{
 }
 
 .ui {
+    margin: 5.3rem 0.5rem 0.5rem 0.5rem;
     position: absolute;
     z-index: 1;
-    display: grid;
-    grid-template-columns: 17rem 10rem;
 }
 
 .hero{
@@ -73,10 +72,10 @@ a:hover{
 
 .settings{
     z-index: 1;
-    width: 15rem;
-    margin-top: 1rem;
-    padding: 1rem;
+    width: 17rem;
+    padding: 0rem 1rem 1rem 1rem;
     background-color: #343434a5;
+    border-radius: 1rem;
 }
 
 #canvas{
@@ -90,13 +89,13 @@ a:hover{
     flex-direction: row;
 }
 
-#close{
-    margin: 1rem 0.8rem 0.8rem 7rem;
+#close-settings{
+    margin: 1rem 0.8rem 0.8rem 9rem;
     padding: 0.2rem 0.7rem 0.2rem 0.7rem;
     font-size: 1.5rem;
 }
 
-#close:hover{
+#close-settings:hover{
     color: #f44;
     cursor:pointer;
 }
@@ -107,13 +106,13 @@ a:hover{
 }
 
 .settings .entry .field-button {
-    margin: 0.8rem 0rem 0rem 1rem;
+    margin: 0.3rem 0rem 0rem 1rem;
 }
 
 .settings .entry .number{
     font-size: 1rem;
     height: 1.2rem;
-    width: 4rem;
+    width: 5rem;
 }
 
 .settings .entry .update{
@@ -122,14 +121,39 @@ a:hover{
 }
 
 .ui .open {
-    margin-top: 1rem;
-    padding: 1rem;
-    text-align: center;
+    padding: 1rem 0rem 1rem 0rem;
     background-color: #343434a5;
     height: 1.25rem;
+    border-radius: 1rem;
 }
 
 .ui .open:hover{
     color: #f44;
     cursor:pointer;
+}
+
+#open-settings{
+    padding: 1rem;
+}
+
+input {
+    border: none;
+    margin: 0.1rem;
+}
+
+button:hover {
+    cursor:pointer;
+}
+
+input:invalid{
+    background-color: rgb(255, 107, 107);
+}
+
+input:invalid + button.update {
+    pointer-events:none;
+    color: #bcbcbc;
+}
+
+.entry p {
+    margin-top: 0.5rem;
 }

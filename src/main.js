@@ -3,49 +3,39 @@ import { Points } from "./points.js";
 import { DFT } from "./dft.js";
 import { Sines } from "./sines.js";
 import { Complex } from "./complex.js";
+import { UIHooks } from "./ui.js";
 
 var canvas = document.getElementById("canvas"); //links the script to the canvas in html
 var ctx = canvas.getContext("2d"); //sets renderer context
 
-// console.log((DFT.apply([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])));
-
-const TRAIL_PROPORTION = 1; 
-const SUBSTEP = 5; //must be 1 or more
-const TRAIL_SIZE = TRAIL_PROPORTION * Math.round((SUBSTEP / 2.5) / Sines.SPEED);
+const DEFAULT_TRAIL_PROPORTION = 1; 
+const DEFAULT_SUBSTEP = 5; //must be 1 or more
 const SCALE = 800;
 const OFFSET = new Complex(500, 500);
 const COLOURS = ["#f00", "#0f0", "#00f", "#ff0", "#0ff", "#f0f"];
 const ARROW_COUNT = 500;
-const POINTS = 100;
+const DEFAULT_SINES = 100;
+
+const settingsState = {
+    substep: DEFAULT_SUBSTEP,
+    trailSize: DEFAULT_TRAIL_PROPORTION * Math.round((DEFAULT_SUBSTEP / 2.5) / (Sines.DEFAULT_PERCENTAGE * Sines.SPEED_SCALAR)),
+    trailProportion: DEFAULT_TRAIL_PROPORTION,
+    sines: DEFAULT_SINES, 
+    percentSpeed: Sines.DEFAULT_PERCENTAGE
+}
+
+const getTrailSize = () => {
+    return settingsState.trailProportion * Math.round((settingsState.substep / 2.5) / (settingsState.percentSpeed * Sines.SPEED_SCALAR));
+}
 
 let dt, pt;
-let trailQueue = Array(TRAIL_SIZE).fill(new Complex());
-let trailNeedsReset = false;
+let trailQueue = Array(settingsState.trailSize).fill(new Complex());
+let needsReset = false;
 
-const pts = new Points(POINTS);
+let pts = new Points(DEFAULT_SINES);
 let sines, arrows;
 
-const state = new State(SCALE, OFFSET, (transform) => {
-    // pts.generate();
-    // pts.transform(transform);
-    // pts.transform({ 
-    //     scale: new Complex(1, 0),
-    //     translate: OFFSET.mul(new Complex(-0.5, 0))
-    // });
-    // const transformedPoints = pts.getPoints();
-    // sines = new Sines(DFT.apply(transformedPoints));
-    // console.log(pts);
-    
-    // console.log(sines);
-
-    // pts.transform(
-    //     { 
-    //         scale: new Complex(1, 0),
-    //         translate: OFFSET.mul(new Complex(0.5, 0))
-    //     }
-    // )
-
-
+const stateTransformHook = (transform) => {
     pts.generate();
     pts.transform(transform);
     pts.transform({
@@ -53,21 +43,47 @@ const state = new State(SCALE, OFFSET, (transform) => {
         translate: new Complex(-1 * OFFSET.re, -1 * OFFSET.im)
     });
 
-    sines = new Sines(DFT.apply(pts.getPoints()));
+    sines = new Sines(DFT.apply(pts.getPoints()), settingsState.percentSpeed);
 
     pts.transform({
         scale: new Complex(1, 0),
         translate: new Complex(OFFSET.re, OFFSET.im)
     });
 
-    trailNeedsReset = true;
-});
+    needsReset = true;
+}
+
+const state = new State(SCALE, OFFSET, stateTransformHook, 
+    new UIHooks(
+        (sines) => { 
+            settingsState.sines = sines;
+            pts = new Points(sines); 
+            stateTransformHook(state.getTransform());
+        },
+        (percentSpeed) => {
+            settingsState.percentSpeed = percentSpeed;
+
+            sines.speed = percentSpeed * Sines.SPEED_SCALAR;
+
+            if(percentSpeed < 1){
+                settingsState.trailSize = 1;
+            }else{
+                settingsState.trailSize = settingsState.trailProportion * Math.round((settingsState.substep / 2.5) / (percentSpeed * Sines.SPEED_SCALAR));
+            }
+
+
+            needsReset = true; //reset it so trail adjusts to speed dynamically
+        },
+        (substeps) => {
+            settingsState.substep = substeps;
+            settingsState.trailSize = getTrailSize();
+            needsReset = true; //reset it so trail adjusts to speed dynamically
+        } 
+    ));
 
 state.init();
 
 function drawArrows(arrows, drawPoint){
-    // if(arrowsX.length !== arrowsY.length) throw Error("main.drawArrows: need equal length arrow arrays");
-
     const count = Math.min(arrows.length, ARROW_COUNT);
 
     ctx.strokeStyle = "#ee2";
@@ -137,16 +153,17 @@ function mainLoop(timestamp){
     ctx.stroke();
 
     if(pts.isLoaded()){
-        const timestep = dt / SUBSTEP;
-        if(trailNeedsReset){
+        const timestep = dt / settingsState.substep;
+        if(needsReset){
             arrows = sines.getArrows(timestamp);
-            trailQueue = Array(TRAIL_SIZE).fill(sines.finalPos.add(OFFSET));
-            trailNeedsReset = false;
+            trailQueue = Array(settingsState.trailSize).fill(sines.finalPos.add(OFFSET));
+
+            needsReset = false;
         }
 
         let drawPoint;
         
-        for(let i = 0; i < SUBSTEP; i++){
+        for(let i = 0; i < settingsState.substep; i++){
             const tt = timestep * i;
             arrows = sines.getArrows(timestamp + tt);
             drawPoint = sines.finalPos.add(OFFSET);
@@ -156,9 +173,6 @@ function mainLoop(timestamp){
 
         drawArrows(arrows, drawPoint);
     }
-        
-    // ctx.fillStyle = 'black';
-    // ctx.fillRect(0,0,canvas.width,canvas.height);
 
     requestAnimationFrame(mainLoop);
 }

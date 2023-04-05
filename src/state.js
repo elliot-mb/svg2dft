@@ -1,8 +1,11 @@
 import {Complex} from "./complex.js";
+import {UI, UIHooks} from "./ui.js";
 
 export class State{
 
-    constructor(size, loc, hook){
+    constructor(size, loc, hook, uiHooks){
+        this.ui = new UI(uiHooks);
+
         this.file = null;
         this.fileText = null;
         this.selected = document.getElementById("selected");
@@ -63,18 +66,20 @@ export class State{
 
                 this.bBox = { w: width, h: height };
 
-                const largestDim = Math.max(this.bBox.w, this.bBox.h);
-                const scaleFact = this.size / largestDim;
-                const diffX = this.size - (this.bBox.w * scaleFact);
-                const diffY = this.size - (this.bBox.h * scaleFact);
-  
-                this.transform =  {
-                    scale: new Complex(scaleFact, 0),
-                    translate: new Complex(this.loc.re - (this.size/2) + (diffX / 2), this.loc.im - (this.size/2) + (diffY / 2))
-                };
-
-                this.hook(this.transform);
+                this.hook(this.getTransform());
             });
+        }
+    }
+
+    getTransform() {
+        const largestDim = Math.max(this.bBox.w, this.bBox.h);
+        const scaleFact = this.size / largestDim;
+        const diffX = this.size - (this.bBox.w * scaleFact);
+        const diffY = this.size - (this.bBox.h * scaleFact);
+
+        return {
+            scale: new Complex(scaleFact, 0),
+            translate: new Complex(this.loc.re - (this.size/2) + (diffX / 2), this.loc.im - (this.size/2) + (diffY / 2))
         }
     }
 
@@ -98,10 +103,6 @@ export class State{
 
     getBBox(){
         return this.bBox;
-    }
-
-    getTransform(){
-        return this.transform;
     }
 
     getSvgBox(){
