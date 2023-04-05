@@ -1,8 +1,8 @@
 export class UIHooks {
     //updators
-    constructor(sines, speed){
+    constructor(sines, speed, substeps){
         if(sines === undefined || sines === null || speed === undefined || speed === null) { throw Error("UIHooks cannot accept undefined hook functions."); }
-        this.list = [sines, speed];
+        this.list = [sines, speed, substeps];
     }
 
     asList(){
@@ -41,6 +41,7 @@ export class UI {
         this.closeSettingsSpan.addEventListener("click", () => {UI.closeSettings(this.settingsPane, this.openSettingsPane);});
     }
 
+    //this function is absolutely beautiful <3
     static zipWidthEventListeners(entries, hooks){
         if(entries.length !== hooks.length) {
             throw Error("There must be the same number of entries and hooks for them to be zipped together.");
@@ -51,7 +52,7 @@ export class UI {
         const updateButtons = entries.map(entry => UI.getFirstElementByClassName(entry, "update"));
 
         entries.map((entry, i) => {
-            updateButtons[i].addEventListener("click", () => { hooks[i](inputs[i].value)} );
+            updateButtons[i].addEventListener("click", () => { hooks[i](+inputs[i].value)} );
         });
     }
 

@@ -30,8 +30,6 @@ a:hover{
     margin-top: 5rem;
     position: absolute;
     z-index: 1;
-    display: grid;
-    grid-template-columns: 17rem 7rem;
 }
 
 .hero{
@@ -91,7 +89,7 @@ a:hover{
 }
 
 #close-settings{
-    margin: 1rem 0.8rem 0.8rem 7rem;
+    margin: 1rem 0.8rem 0.8rem 9rem;
     padding: 0.2rem 0.7rem 0.2rem 0.7rem;
     font-size: 1.5rem;
 }
@@ -107,7 +105,7 @@ a:hover{
 }
 
 .settings .entry .field-button {
-    margin: 0.8rem 0rem 0rem 1rem;
+    margin: 0.3rem 0rem 0rem 1rem;
 }
 
 .settings .entry .number{
@@ -123,10 +121,8 @@ a:hover{
 
 .ui .open {
     padding: 1rem 0rem 1rem 0rem;
-    text-align: center;
     background-color: #343434a5;
     height: 1.25rem;
-    width: 9rem;
 }
 
 .ui .open:hover{
@@ -154,4 +150,8 @@ input:invalid{
 input:invalid + button.update {
     pointer-events:none;
     color: #bcbcbc;
+}
+
+.entry p {
+    margin-top: 0.5rem;
 }

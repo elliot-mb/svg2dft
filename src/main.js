@@ -24,10 +24,13 @@ const settingsState = {
     percentSpeed: Sines.DEFAULT_PERCENTAGE
 }
 
+const getTrailSize = () => {
+    return settingsState.trailProportion * Math.round((settingsState.substep / 2.5) / (settingsState.percentSpeed * Sines.SPEED_SCALAR));
+}
 
 let dt, pt;
 let trailQueue = Array(settingsState.trailSize).fill(new Complex());
-let trailNeedsReset = false;
+let needsReset = false;
 
 let pts = new Points(DEFAULT_SINES);
 let sines, arrows;
@@ -47,7 +50,7 @@ const stateTransformHook = (transform) => {
         translate: new Complex(OFFSET.re, OFFSET.im)
     });
 
-    trailNeedsReset = true;
+    needsReset = true;
 }
 
 const state = new State(SCALE, OFFSET, stateTransformHook, 
@@ -55,7 +58,7 @@ const state = new State(SCALE, OFFSET, stateTransformHook,
         (sines) => { 
             settingsState.sines = sines;
             pts = new Points(sines); 
-            stateTransformHook(state.transform);
+            stateTransformHook(state.getTransform());
         },
         (percentSpeed) => {
             settingsState.percentSpeed = percentSpeed;
@@ -68,10 +71,14 @@ const state = new State(SCALE, OFFSET, stateTransformHook,
                 settingsState.trailSize = settingsState.trailProportion * Math.round((settingsState.substep / 2.5) / (percentSpeed * Sines.SPEED_SCALAR));
             }
 
-            console.log(settingsState.trailSize, percentSpeed);
 
-            trailNeedsReset = true; //reset it so trail adjusts to speed dynamically
-        }
+            needsReset = true; //reset it so trail adjusts to speed dynamically
+        },
+        (substeps) => {
+            settingsState.substep = substeps;
+            settingsState.trailSize = getTrailSize();
+            needsReset = true; //reset it so trail adjusts to speed dynamically
+        } 
     ));
 
 state.init();
@@ -147,10 +154,11 @@ function mainLoop(timestamp){
 
     if(pts.isLoaded()){
         const timestep = dt / settingsState.substep;
-        if(trailNeedsReset){
+        if(needsReset){
             arrows = sines.getArrows(timestamp);
             trailQueue = Array(settingsState.trailSize).fill(sines.finalPos.add(OFFSET));
-            trailNeedsReset = false;
+
+            needsReset = false;
         }
 
         let drawPoint;

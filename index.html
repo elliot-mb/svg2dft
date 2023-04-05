@@ -51,6 +51,13 @@
                         <button class="update">update</button>
                     </div>
                 </div>
+                <div class="entry">
+                    <p>Trail substeps:</p>
+                    <div class="field-button">
+                        <input class="number" id="substep-input" type="number" min="1" max="20" placeholder="1-20" list="defaultSubsteps" required>
+                        <button class="update">update</button>
+                    </div>
+                </div>
             </div>
             <div class="open">
                 <span id="open-settings">Open settings</span>
@@ -74,5 +81,13 @@
         <option value="50"></option>
         <option value="100"></option>
     </datalist>
+
+    <datalist id="defaultSubsteps">
+        <option value="1"></option>
+        <option value="2"></option>
+        <option value="5"></option>
+        <option value="10"></option>
+    </datalist>
+
 </body>
 </html>
