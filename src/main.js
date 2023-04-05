@@ -52,6 +52,11 @@ const ui = new UI(new UIHooks(
 
         drawingMustReset = true; //reset it so trail adjusts to speed dynamically
     },
+    (scale) => {
+        settings.setScale(scale);
+        state.setScale(scale);
+        stateTransformHook(state.getTransform());
+    },
     (percentTrail) => {
         settings.setTrailProportion(percentTrail/100);
         settings.setTrailSize();

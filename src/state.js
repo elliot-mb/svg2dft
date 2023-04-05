@@ -3,7 +3,7 @@ import {UI, UIHooks} from "./ui.js";
 
 export class State{
 
-    constructor(size, loc, hook){
+    constructor(scale, offset, hook){
         this.file = null;
         this.fileText = null;
         this.selected = document.getElementById("selected");
@@ -12,8 +12,8 @@ export class State{
         this.svgBox = null;
         this.bBox = null;
         this.transform = null;
-        this.size = size;
-        this.loc = loc; //location of the centre of the points
+        this.scale = scale;
+        this.offset = offset; //offsetation of the centre of the points
 
         this.hook = hook; //function to run when file changes, is run during promise
         // hook should take one argument (transform)
@@ -71,13 +71,13 @@ export class State{
 
     getTransform() {
         const largestDim = Math.max(this.bBox.w, this.bBox.h);
-        const scaleFact = this.size / largestDim;
-        const diffX = this.size - (this.bBox.w * scaleFact);
-        const diffY = this.size - (this.bBox.h * scaleFact);
+        const scaleFact = this.scale / largestDim;
+        const diffX = this.scale - (this.bBox.w * scaleFact);
+        const diffY = this.scale - (this.bBox.h * scaleFact);
 
         return {
             scale: new Complex(scaleFact, 0),
-            translate: new Complex(this.loc.re - (this.size/2) + (diffX / 2), this.loc.im - (this.size/2) + (diffY / 2))
+            translate: new Complex(this.offset.re - (this.scale/2) + (diffX / 2), this.offset.im - (this.scale/2) + (diffY / 2))
         }
     }
 
@@ -110,4 +110,7 @@ export class State{
     getSvg(){
         return this.svgBox.children[0];
     }
+
+    setScale(scale){ this.scale = scale; }
+    setOffset(offset) { this.offset = offset; }
 }

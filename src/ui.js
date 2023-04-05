@@ -1,12 +1,13 @@
 export class UIHooks {
     //updator functions
-    constructor(
+    constructor( //functions are not passed as an array to make them very deliberate
         setSines,
         setPercentSpeed,
+        setScale,
         setPercentTrail,
         setSubsteps
     ){
-        this.list = [setSines, setPercentSpeed, setPercentTrail, setSubsteps];
+        this.list = [setSines, setPercentSpeed, setScale, setPercentTrail, setSubsteps];
         this.list.map(f => {
             if(f === undefined || f === null) { 
                 throw Error("UIHooks cannot accept undefined/null hook functions."); 
