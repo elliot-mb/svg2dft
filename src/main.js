@@ -19,25 +19,10 @@ let drawingMustReset = false;
 let points = new Points(settings.getSines());
 let sines, arrows;
 
-const makePointsHook = (transform, state) => {
+// the following tell buttons what functions to run, and what settings attributes correspond to which fields, respectively 
 
-    points.generate();
-    points.transform(transform);
-
-    sines = new Sines(DFT.apply(points.getPoints()), settings.getPercentSpeed());
-
-    drawingMustReset = true;
-}
-
-//is run whenever load a new svg, and thats it! hooks onto image upload in state
-const resetHook = () => {
-    settings.reset();
-    const scale = state.getScale(Settings.DEFAULT_SCALE_PX); 
-    settings.setScale(scale);
-}
-
-//UIHooks object has all hooks for settings fields IN ORDER
-const ui = new UI(new UIHooks( 
+//this object has all hooks for setting settings fields IN ORDER
+const setterHooks = new UIHooks( 
     (sines) => { 
         settings.setSines(sines);
         points = new Points(sines); 
@@ -90,9 +75,40 @@ const ui = new UI(new UIHooks(
 
         drawingMustReset = true; 
     }
-));
+);
+
+//hooks to retreive the value which corresponds to their field from settings object (always a 1:1 correspondence between settings setter hooks and resetter hooks, hence the reuse of UIHooks class)
+const getterHooks = new UIHooks( 
+    () => settings.getSines(),
+    () => settings.getPercentSpeed(),
+    () => Settings.DEFAULT_SCALE_PX, // we need to use the default directly for this since our actual scale is relative to the svg
+    () => settings.getOffset().re, //x coordinate like in the input
+    () => settings.getOffset().im, //y coordinate like in the input
+    () => settings.getTrailProportion() * 100, //turns it into a percentage, like in the input
+    () => settings.getSubsteps()
+)
+
+const ui = new UI(setterHooks, getterHooks);
 
 ui.init();
+
+const makePointsHook = (transform) => {
+
+    points.generate();
+    points.transform(transform);
+
+    sines = new Sines(DFT.apply(points.getPoints()), settings.getPercentSpeed());
+
+    drawingMustReset = true;
+}
+
+//is run whenever we load a new svg, and thats it! hooks onto image upload in state
+const resetHook = () => {
+    settings.reset(); //set settings to defaults
+    const scale = state.getScale(Settings.DEFAULT_SCALE_PX); 
+    settings.setScale(scale);
+    ui.reset(); //set ui fields to settings (and thus defaults)
+}
 
 const state = new State(makePointsHook, resetHook);
 

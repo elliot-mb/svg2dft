@@ -63,7 +63,7 @@ export class State{
                 this.bBox = { w: width, h: height };    
 
                 this.resetHook(); //sets a new svg to default size
-                this.makePointsHook(this.getOriginTransform(), this);
+                this.makePointsHook(this.getOriginTransform());
             });
         }
     }
@@ -105,7 +105,7 @@ export class State{
         if(this.isValid()){
             text = `Uploaded '${this.file.name}'`;
         }else{
-            text = `'${this.file.name}' has the wrong extension, please upload a SVG file`;
+            text = `'${this.file.name}' has the wrong extension, please upload an SVG file`;
         }
         return text;
     }

@@ -32,8 +32,13 @@ export class UI {
     /* this class interprets interactions with the UI and edits the DOM and runs functions when state changes as required */
     /* hooks contains an object that must have a certain set of named functions inside it to run when certain update buttons are pressed*/ 
 
-    constructor(hooks){
-        this.hooks = hooks;
+    constructor(setterHooks, getterHooks){
+        //both hooks collections denote the correspondance between the settings object in main and the ui fields and update boxes
+        this.setterHooks = setterHooks; 
+        this.getterHooks = getterHooks;
+
+        this.enabled = false;
+
         this.openSettingsSpan = document.getElementById("open-settings");
         this.openSettingsPane = UI.getFirstElementByClassName(document, "open");
         this.closeSettingsSpan = document.getElementById("close-settings");
@@ -41,20 +46,23 @@ export class UI {
         this.entries = Array.from(document.getElementsByClassName("entry"));
     }
 
+    static getInputs(entries){
+        return entries.map(entry => UI.getFirstElementByClassName(entry, "number"));
+    }
+
     //associate hooks with their respective fields and update buttons
-    static zipWidthEventListeners(entries, hooks){
-        console.log(entries, hooks);
-        if(entries.length !== hooks.length) {
+    static zipWidthEventListeners(entries, setterHooks){
+        console.log(entries, setterHooks);
+        if(entries.length !== setterHooks.length) {
             throw Error("There must be the same number of entries and hooks for them to be zipped together.");
         }
 
-        const inputs = entries.map(entry => UI.getFirstElementByClassName(entry, "number"));
-
+        const inputs = UI.getInputs(entries);
         const updateButtons = entries.map(entry => UI.getFirstElementByClassName(entry, "update"));
 
         entries.map((entry, i) => {
-            updateButtons[i].addEventListener("click", () => { hooks[i](+inputs[i].value)} ); //the plus here '+inputs[i].value' is just javascript mumbo-jumbo for integer casting
-        });
+            updateButtons[i].addEventListener("click", () => setterHooks[i](+inputs[i].value)); 
+        });//the plus here '+inputs[i].value' is just javascript mumbo-jumbo for integer casting
     }
 
     //stateless functions
@@ -73,10 +81,15 @@ export class UI {
     }
 
     init(){
-        UI.zipWidthEventListeners(this.entries, this.hooks.getList());
+        UI.zipWidthEventListeners(this.entries, this.setterHooks.getList());
 
         this.openSettingsSpan.addEventListener("click", () => {UI.openSettings(this.settingsPane, this.openSettingsPane);});
         
         this.closeSettingsSpan.addEventListener("click", () => {UI.closeSettings(this.settingsPane, this.openSettingsPane);});
+    }
+
+    reset(){
+        UI.getInputs(this.entries).map((input, i) => input.value = this.getterHooks.getList()[i]());
+        this.enabled = true; //is enabled forever more
     }
 }
