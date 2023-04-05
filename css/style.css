@@ -27,7 +27,7 @@ a:hover{
 }
 
 .ui {
-    margin-top: 5rem;
+    margin: 5.3rem 0.5rem 0.5rem 0.5rem;
     position: absolute;
     z-index: 1;
 }
@@ -75,6 +75,7 @@ a:hover{
     width: 17rem;
     padding: 0rem 1rem 1rem 1rem;
     background-color: #343434a5;
+    border-radius: 1rem;
 }
 
 #canvas{
@@ -123,6 +124,7 @@ a:hover{
     padding: 1rem 0rem 1rem 0rem;
     background-color: #343434a5;
     height: 1.25rem;
+    border-radius: 1rem;
 }
 
 .ui .open:hover{
