@@ -68,6 +68,10 @@ export class State{
             this.file = e.target.files[e.target.files.length - 1]; 
             this.selected.textContent = this.filePrompt();
 
+            if(!this.isValid()){
+                throw Error("Can only process SVGs");
+            }
+
             this.file.text().then((text) => this.processSVGAsText(text));
         }
 
