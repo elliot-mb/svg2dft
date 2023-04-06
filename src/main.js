@@ -152,6 +152,8 @@ function drawArrows(arrows, finalPoint){
 
         pos = pos.add(ar);
     }
+    const dispPos = toDisplay(pos);
+    ctx.lineTo(dispPos.re, dispPos.im);
     ctx.stroke();
 
     ctx.fillStyle = "#00f";
