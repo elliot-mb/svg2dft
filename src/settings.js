@@ -15,8 +15,7 @@ export class Settings{
     static DEFAULT_TRAIL_SIZE = Settings.calcTrailSize(Settings.DEFAULT_TRAIL_PROPORTION, Settings.DEFAULT_SUBSTEPS, Settings.DEFAULT_PERCENT_SPEED);
 
     static calcTrailSize(proportion, substeps, percentSpeed){
-        console.log(proportion, substeps, percentSpeed);
-        return proportion * Math.round((substeps / 2.5) / (percentSpeed * Sines.SPEED_SCALAR));
+        return Math.floor(proportion * Math.round((substeps / 2.5) / (percentSpeed * Sines.SPEED_SCALAR)));
     }
 
     constructor(){
@@ -30,7 +29,10 @@ export class Settings{
         this.offset = Settings.DEFAULT_OFFSET;
         this.arrowCount = Settings.DEFAULT_ARROW_COUNT;
         this.sines = Settings.DEFAULT_SINES;
-        this.percentSpeed = Settings.DEFAULT_PERCENT_SPEED;
+        this.percentSpeed = {
+            last: Settings.DEFAULT_PERCENT_SPEED,
+            curr: Settings.DEFAULT_PERCENT_SPEED
+        };
         this.trailSize = Settings.DEFAULT_TRAIL_SIZE;
     }
 
@@ -44,19 +46,23 @@ export class Settings{
         this.offset = Settings.DEFAULT_OFFSET;
         this.arrowCount = Settings.DEFAULT_ARROW_COUNT;
         this.sines = Settings.DEFAULT_SINES;
-        this.percentSpeed = Settings.DEFAULT_PERCENT_SPEED;
+        this.percentSpeed = {
+            last: Settings.DEFAULT_PERCENT_SPEED,
+            curr: Settings.DEFAULT_PERCENT_SPEED
+        };
         this.trailSize = Settings.DEFAULT_TRAIL_SIZE;
     }
 
     getTrailProportion() { return this.trailProportion; }
     getSubsteps() { return this.substeps; }
-    getLastScale() { return this.scale.last; } //does not need a set
     getScale() { return this.scale.curr; }
+    getLastScale() { return this.scale.last; } //does not need a set
     getOffset() { return this.offset; }
     getArrowCount() { return this.arrowCount; }
     getSines() { return this.sines; }
-    getPercentSpeed() { return this.percentSpeed; }
-    getTrailSize() { console.log(this.trailSize); return this.trailSize; }
+    getPercentSpeed() { return this.percentSpeed.curr; }
+    getLastPercentSpeed() { return this.percentSpeed.last; } //does not need a set
+    getTrailSize() { return this.trailSize; }
 
     setTrailProportion(trailProportion) { this.trailProportion = trailProportion; }
     setSubsteps(substeps) { this.substeps = substeps; }
@@ -67,9 +73,12 @@ export class Settings{
     setOffset(offset) { this.offset = offset; }
     setArrowCount(arrowCount) {this.arrowCount = arrowCount; }
     setSines(sines) { this.sines = sines; }
-    setPercentSpeed(percentSpeed) { this.percentSpeed = percentSpeed ; }
+    setPercentSpeed(percentSpeed) { 
+        this.percentSpeed.last = this.percentSpeed.curr;
+        this.percentSpeed.curr = percentSpeed;
+    }
     setTrailSize() { 
         //sets according to static method
-        this.trailSize = this.percentSpeed < 1 ? 1 : Settings.calcTrailSize(this.trailProportion, this.substeps, this.percentSpeed); 
+        this.trailSize = this.percentSpeed.curr < 1 ? 1 : Settings.calcTrailSize(this.trailProportion, this.substeps, this.percentSpeed.curr); 
     }
 }

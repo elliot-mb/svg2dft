@@ -24,7 +24,7 @@ export class State{
         this.fileText = text;
         const centre = document.getElementById("centre-absolute");
         const lastBox = document.getElementById(this.svgId);
-        if(lastBox !== null){
+        if(lastBox !== null){ //remove the previous svg 
             lastBox.remove();
         }
         const svgBox = document.createElement("div");
@@ -32,6 +32,13 @@ export class State{
         svgBox.setAttribute("style", "display: none;");
         svgBox.innerHTML = text;
         centre.appendChild(svgBox);
+
+        const paths = document.getElementsByTagName("path");
+        if(paths.length === 0){
+            document.getElementById(this.svgId).remove();
+            centre.appendChild(lastBox); //brings back last svg file, as it failed to verify this one was drawable 
+            this.setPromptAndError("Could not find paths in SVG");
+        }
     
         this.svgBox = svgBox;
 
@@ -44,7 +51,7 @@ export class State{
             //try matching on viewBox property
             const viewBoxMatch = this.getSvg().getAttribute("viewBox").match(nums); //top left x, top left y, bottom right ...
             if(viewBoxMatch === null){
-                throw Error("Error, SVG has non-numerical dimesions");
+                this.setPromptAndError("SVG has non-numerical dimesions");
             }else{
                 
                 width = viewBoxMatch[2]; // bottom right x coord
@@ -66,13 +73,13 @@ export class State{
         this.input.onchange = e => { 
             //writes svg to document on update
             this.file = e.target.files[e.target.files.length - 1]; 
-            this.selected.textContent = this.filePrompt();
 
             if(!this.isValid()){
-                throw Error("Can only process SVGs");
+                this.setPromptAndError("Can only process SVGs");
             }
 
             this.file.text().then((text) => this.processSVGAsText(text));
+            this.setPromptSuccess();
         }
 
         this.processSVGAsText(State.DEFAULT_SVG_TEXT);
@@ -110,14 +117,13 @@ export class State{
         return this.isValid() && this.svgBox !== null && this.bBox !== null && this.transform !== null;
     }
 
-    filePrompt() {
-        let text = ""
-        if(this.isValid()){
-            text = `Uploaded '${this.file.name}'`;
-        }else{
-            text = `'${this.file.name}' has the wrong extension, please upload an SVG file`;
-        }
-        return text;
+    setPromptSuccess(){
+        this.selected.textContent = "Uploaded '" + this.file.name + "'";
+    }
+
+    setPromptAndError(e){
+        this.selected.textContent = "Error: " + e;
+        throw Error(e); //crash (could not handle error)
     }
 
     getBBox(){

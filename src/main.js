@@ -11,12 +11,12 @@ var ctx = canvas.getContext("2d"); //sets renderer context
 let dt, pt;
 
 const settings = new Settings();
-console.log(settings.getTrailSize());
 
 let trailQueue = Array(settings.getTrailSize()).fill(new Complex());
+let trailOffset = 0;
 let drawingMustReset = false; 
 
-let points = new Points(settings.getSines());
+const points = new Points(settings.getSines());
 let sines, arrows;
 
 // the following tell buttons what functions to run, and what settings attributes correspond to which fields, respectively 
@@ -25,11 +25,12 @@ let sines, arrows;
 const setterHooks = new UIHooks( 
     (sines) => { 
         settings.setSines(sines);
-        points = new Points(sines); 
+        points.setCount(sines);
         makePointsHook(state.getOriginTransform());
     },
     (percentSpeed) => {
         settings.setPercentSpeed(percentSpeed);
+
         sines.setSpeed(percentSpeed * Sines.SPEED_SCALAR);
         settings.setTrailSize();
 
@@ -105,6 +106,7 @@ const makePointsHook = (transform) => {
 //is run whenever we load a new svg, and thats it! hooks onto image upload in state
 const resetHook = () => {
     settings.reset(); //set settings to defaults
+    points.setCount(settings.getSines());
     const scale = state.getScale(Settings.DEFAULT_SCALE_PX); 
     settings.setScale(scale);
     ui.reset(); //set ui fields to settings (and thus defaults)
@@ -200,7 +202,15 @@ function mainLoop(timestamp){
 
             const timestep = dt / settings.getSubsteps();
             if(drawingMustReset){
-                arrows = sines.getArrows(timestamp);
+
+                if(settings.getPercentSpeed() !== 0){
+                    trailOffset += (timestamp + trailOffset) * ((settings.getLastPercentSpeed() / settings.getPercentSpeed()) - 1);
+                    console.log(trailOffset);
+                }else{
+                    trailOffset = 0;
+                }
+
+                arrows = sines.getArrows(timestamp + trailOffset);
                 trailQueue = Array(settings.getTrailSize()).fill(toDisplay(sines.getFinalPos()));
 
                 drawingMustReset = false;
@@ -210,7 +220,7 @@ function mainLoop(timestamp){
             
             for(let i = 0; i < settings.getSubsteps(); i++){
                 const tt = timestep * i;
-                arrows = sines.getArrows(timestamp + tt);
+                arrows = sines.getArrows(timestamp + trailOffset + tt);
                 finalPoint = sines.getFinalPos();
                 trailQueue.shift();
                 trailQueue.push(toDisplay(finalPoint));

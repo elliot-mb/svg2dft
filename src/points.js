@@ -22,7 +22,6 @@ export class Points {
     generate(){
         this.reset(); 
 
-        console.log("generate");
         const paths = document.getElementsByTagName("path");
 
         const totalLength = Array.from(paths).reduce((tot, p) => tot + p.getTotalLength(), 0);
@@ -89,6 +88,10 @@ export class Points {
         return this.points;
     }
 
+    setCount(count){
+        this.count = count;
+    }
+
     getComponents(){
         return this.components; 
     }
@@ -97,37 +100,3 @@ export class Points {
         return this.points !== undefined && this.points.length !== 0; 
     }
 }
-
-// export class Point{
-//     constructor(x, y){
-//         this.x = x === undefined ? 0 : x;
-//         this.y = y === undefined ? 0 : y;
-//     }
-
-//     static assertDefined(pt){
-//         if(pt.x === undefined || pt.y === undefined){
-//             throw Error("Point.add: x and y must be defined");
-//         }
-//     }
-
-//     add(pt){
-//         Point.assertDefined(pt);
-//         return new Point(this.x + pt.x, this.y + pt.y);
-//     }
-
-//     //point * scalar multiplication 
-//     mul(n){
-//         return new Point(this.x * n, this.y * n);
-//     }
-
-//     sub(pt){
-//         Point.assertDefined(pt);
-//         return this.add(pt.mul(-1));
-//     }
-
-//     dist(pt){
-//         Point.assertDefined(pt);
-//         const diff = this.sub(pt);
-//         return Math.sqrt((diff.x * diff.x) + (diff.y * diff.y));
-//     }
-// }
