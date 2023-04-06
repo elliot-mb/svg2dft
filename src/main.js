@@ -172,46 +172,50 @@ function toDisplay(point){
 
 function mainLoop(timestamp){
 
-    dt = timestamp - pt;
-    pt = timestamp;
+    if(timestamp !== undefined){
+        dt = timestamp - pt;
+        pt = timestamp;
 
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0,0,1000,1000);
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0,0,1000,1000);
 
-    // points.getPoints().map((pt) => {
-    //     ctx.fillStyle = "#131";
-    //     ctx.fillRect(pt.re - 4, pt.im - 4, 8, 8);
-    // });
+        // points.getPoints().map((pt) => {
+        //     ctx.fillStyle = "#131";
+        //     ctx.fillRect(pt.re - 4, pt.im - 4, 8, 8);
+        // });
 
-    ctx.strokeStyle = "#511";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    points.getPoints().map((pt) => {
-        const dispPt = toDisplay(pt);
-        ctx.lineTo(dispPt.re, dispPt.im);
-    });
-    ctx.stroke();
+        if(points.isLoaded()){
+            ctx.strokeStyle = "#818";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            points.getPoints().map((pt) => {
+                const dispPt = toDisplay(pt);
+                ctx.lineTo(dispPt.re, dispPt.im);
+            });
+            const dispPt = toDisplay(points.getPoints()[0]);
+            ctx.lineTo(dispPt.re, dispPt.im);
+            ctx.stroke();
 
-    if(points.isLoaded()){
-        const timestep = dt / settings.getSubsteps();
-        if(drawingMustReset){
-            arrows = sines.getArrows(timestamp);
-            trailQueue = Array(settings.getTrailSize()).fill(toDisplay(sines.getFinalPos()));
+            const timestep = dt / settings.getSubsteps();
+            if(drawingMustReset){
+                arrows = sines.getArrows(timestamp);
+                trailQueue = Array(settings.getTrailSize()).fill(toDisplay(sines.getFinalPos()));
 
-            drawingMustReset = false;
+                drawingMustReset = false;
+            }
+
+            let finalPoint;
+            
+            for(let i = 0; i < settings.getSubsteps(); i++){
+                const tt = timestep * i;
+                arrows = sines.getArrows(timestamp + tt);
+                finalPoint = sines.getFinalPos();
+                trailQueue.shift();
+                trailQueue.push(toDisplay(finalPoint));
+            }
+
+            drawArrows(arrows, toDisplay(finalPoint));
         }
-
-        let finalPoint;
-        
-        for(let i = 0; i < settings.getSubsteps(); i++){
-            const tt = timestep * i;
-            arrows = sines.getArrows(timestamp + tt);
-            finalPoint = sines.getFinalPos();
-            trailQueue.shift();
-            trailQueue.push(toDisplay(finalPoint));
-        }
-
-        drawArrows(arrows, toDisplay(finalPoint));
     }
 
     requestAnimationFrame(mainLoop);
