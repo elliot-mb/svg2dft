@@ -3,88 +3,119 @@ import { Points } from "./points.js";
 import { DFT } from "./dft.js";
 import { Sines } from "./sines.js";
 import { Complex } from "./complex.js";
-import { UIHooks } from "./ui.js";
+import { UI, UIHooks } from "./ui.js";
+import { Settings } from "./settings.js";
 
 var canvas = document.getElementById("canvas"); //links the script to the canvas in html
 var ctx = canvas.getContext("2d"); //sets renderer context
-
-const DEFAULT_TRAIL_PROPORTION = 1; 
-const DEFAULT_SUBSTEP = 5; //must be 1 or more
-const SCALE = 800;
-const OFFSET = new Complex(500, 500);
-const COLOURS = ["#f00", "#0f0", "#00f", "#ff0", "#0ff", "#f0f"];
-const ARROW_COUNT = 500;
-const DEFAULT_SINES = 100;
-
-const settingsState = {
-    substep: DEFAULT_SUBSTEP,
-    trailSize: DEFAULT_TRAIL_PROPORTION * Math.round((DEFAULT_SUBSTEP / 2.5) / (Sines.DEFAULT_PERCENTAGE * Sines.SPEED_SCALAR)),
-    trailProportion: DEFAULT_TRAIL_PROPORTION,
-    sines: DEFAULT_SINES, 
-    percentSpeed: Sines.DEFAULT_PERCENTAGE
-}
-
-const getTrailSize = () => {
-    return settingsState.trailProportion * Math.round((settingsState.substep / 2.5) / (settingsState.percentSpeed * Sines.SPEED_SCALAR));
-}
-
 let dt, pt;
-let trailQueue = Array(settingsState.trailSize).fill(new Complex());
-let needsReset = false;
 
-let pts = new Points(DEFAULT_SINES);
+const settings = new Settings();
+console.log(settings.getTrailSize());
+
+let trailQueue = Array(settings.getTrailSize()).fill(new Complex());
+let drawingMustReset = false; 
+
+let points = new Points(settings.getSines());
 let sines, arrows;
 
-const stateTransformHook = (transform) => {
-    pts.generate();
-    pts.transform(transform);
-    pts.transform({
-        scale: new Complex(1, 0), 
-        translate: new Complex(-1 * OFFSET.re, -1 * OFFSET.im)
-    });
+// the following tell buttons what functions to run, and what settings attributes correspond to which fields, respectively 
 
-    sines = new Sines(DFT.apply(pts.getPoints()), settingsState.percentSpeed);
+//this object has all hooks for setting settings fields IN ORDER
+const setterHooks = new UIHooks( 
+    (sines) => { 
+        settings.setSines(sines);
+        points = new Points(sines); 
+        makePointsHook(state.getOriginTransform());
+    },
+    (percentSpeed) => {
+        settings.setPercentSpeed(percentSpeed);
+        sines.setSpeed(percentSpeed * Sines.SPEED_SCALAR);
+        settings.setTrailSize();
 
-    pts.transform({
-        scale: new Complex(1, 0),
-        translate: new Complex(OFFSET.re, OFFSET.im)
-    });
+        drawingMustReset = true; //reset it so trail adjusts to speed dynamically
+    },
+    (scalePx) => {
+        const scale = state.getScale(scalePx); //relative to the svg size
+        settings.setScale(scale);
+        trailQueue = trailQueue.map((pt) => pt
+            .sub(settings.getOffset())
+            .mul(new Complex(settings.getScale()/settings.getLastScale()))
+            .add(settings.getOffset())
+        );
 
-    needsReset = true;
+    },
+    (offsetXPx) => {
+        const offset = settings.getOffset();
+        const newOffset = new Complex(offsetXPx, offset.im);
+        trailQueue = trailQueue.map((pt) => pt
+            .sub(settings.getOffset())
+            .add(newOffset)
+        );
+        settings.setOffset(newOffset);
+    },
+    (offsetYPx) => {
+        const offset = settings.getOffset();
+        const newOffset = new Complex(offset.re, offsetYPx);
+        trailQueue = trailQueue.map((pt) => pt
+            .sub(settings.getOffset())
+            .add(newOffset)
+        );
+        settings.setOffset(newOffset);
+    },
+    (percentTrail) => {
+        settings.setTrailProportion(percentTrail/100);
+        settings.setTrailSize();
+
+        drawingMustReset = true;
+    },
+    (substeps) => {
+        settings.setSubsteps(substeps);
+        settings.setTrailSize();
+
+        drawingMustReset = true; 
+    }
+);
+
+//hooks to retreive the value which corresponds to their field from settings object (always a 1:1 correspondence between settings setter hooks and resetter hooks, hence the reuse of UIHooks class)
+const getterHooks = new UIHooks( 
+    () => settings.getSines(),
+    () => settings.getPercentSpeed(),
+    () => Settings.DEFAULT_SCALE_PX, // we need to use the default directly for this since our actual scale is relative to the svg
+    () => settings.getOffset().re, //x coordinate like in the input
+    () => settings.getOffset().im, //y coordinate like in the input
+    () => settings.getTrailProportion() * 100, //turns it into a percentage, like in the input
+    () => settings.getSubsteps()
+)
+
+const ui = new UI(setterHooks, getterHooks);
+
+ui.init();
+
+const makePointsHook = (transform) => {
+
+    points.generate();
+    points.transform(transform);
+
+    sines = new Sines(DFT.apply(points.getPoints()), settings.getPercentSpeed());
+
+    drawingMustReset = true;
 }
 
-const state = new State(SCALE, OFFSET, stateTransformHook, 
-    new UIHooks(
-        (sines) => { 
-            settingsState.sines = sines;
-            pts = new Points(sines); 
-            stateTransformHook(state.getTransform());
-        },
-        (percentSpeed) => {
-            settingsState.percentSpeed = percentSpeed;
+//is run whenever we load a new svg, and thats it! hooks onto image upload in state
+const resetHook = () => {
+    settings.reset(); //set settings to defaults
+    const scale = state.getScale(Settings.DEFAULT_SCALE_PX); 
+    settings.setScale(scale);
+    ui.reset(); //set ui fields to settings (and thus defaults)
+}
 
-            sines.speed = percentSpeed * Sines.SPEED_SCALAR;
-
-            if(percentSpeed < 1){
-                settingsState.trailSize = 1;
-            }else{
-                settingsState.trailSize = settingsState.trailProportion * Math.round((settingsState.substep / 2.5) / (percentSpeed * Sines.SPEED_SCALAR));
-            }
-
-
-            needsReset = true; //reset it so trail adjusts to speed dynamically
-        },
-        (substeps) => {
-            settingsState.substep = substeps;
-            settingsState.trailSize = getTrailSize();
-            needsReset = true; //reset it so trail adjusts to speed dynamically
-        } 
-    ));
+const state = new State(makePointsHook, resetHook);
 
 state.init();
 
-function drawArrows(arrows, drawPoint){
-    const count = Math.min(arrows.length, ARROW_COUNT);
+function drawArrows(arrows, finalPoint){
+    const count = Math.min(arrows.length, settings.getArrowCount());
 
     ctx.strokeStyle = "#ee2";
     ctx.lineWidth = 2;
@@ -94,84 +125,97 @@ function drawArrows(arrows, drawPoint){
     });
     ctx.stroke();
 
-    let pos = OFFSET;
+    //draws circles
+    let pos = new Complex();
     ctx.strokeStyle = "#aaa";
     ctx.lineWidth = 1;
     for(let i = 0; i < count; i++){
         const ar = arrows[i];
         const len = ar.abs();
         ctx.beginPath();
-        ctx.arc(pos.re, pos.im, len, 0, 2 * Math.PI);
+        const dispPos = toDisplay(pos);
+        ctx.arc(dispPos.re, dispPos.im, len * settings.getScale(), 0, 2 * Math.PI);
         ctx.stroke(); 
+
         pos = pos.add(ar);
     }
 
+    //draws spinny vectors
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 1;
     ctx.beginPath();
-
-    pos = OFFSET;
-    ctx.moveTo(pos.re, pos.im);
-
+    pos = new Complex();
     for(let i = 0; i < count; i++){
         const ar = arrows[i];
+        const dispPos = toDisplay(pos);
+        ctx.lineTo(dispPos.re, dispPos.im);
+
         pos = pos.add(ar);
-        ctx.lineTo(pos.re, pos.im);
     }
     ctx.stroke();
 
     ctx.fillStyle = "#00f";
     ctx.beginPath();
-    ctx.arc(drawPoint.re, drawPoint.im, 3, 0, 2 * Math.PI);
+    ctx.arc(finalPoint.re, finalPoint.im, 3, 0, 2 * Math.PI);
     ctx.fill(); 
     ctx.strokeStyle = "#00f";
     ctx.beginPath();
     ctx.lineWidth = 3;
-    ctx.rect(drawPoint.re - 20, drawPoint.im - 20, 40, 40);
+    ctx.rect(finalPoint.re - 20, finalPoint.im - 20, 40, 40);
     ctx.stroke(); 
+}
+
+//transforms coordinates around the origin into display space
+function toDisplay(point){
+    return point.mul(new Complex(settings.getScale())).add(settings.getOffset());
 }
 
 function mainLoop(timestamp){
 
-    dt = timestamp - pt;
-    pt = timestamp;
+    if(timestamp !== undefined){
+        dt = timestamp - pt;
+        pt = timestamp;
 
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0,0,1000,1000);
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0,0,1000,1000);
 
-    // pts.getPoints().map((pt) => {
-    //     ctx.fillStyle = "#131";
-    //     ctx.fillRect(pt.re - 4, pt.im - 4, 8, 8);
-    // });
+        // points.getPoints().map((pt) => {
+        //     ctx.fillStyle = "#131";
+        //     ctx.fillRect(pt.re - 4, pt.im - 4, 8, 8);
+        // });
 
-    ctx.strokeStyle = "#511";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    pts.getPoints().map((pt) => {
-        ctx.lineTo(pt.re, pt.im);
-    });
-    ctx.stroke();
+        if(points.isLoaded()){
+            ctx.strokeStyle = "#818";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            points.getPoints().map((pt) => {
+                const dispPt = toDisplay(pt);
+                ctx.lineTo(dispPt.re, dispPt.im);
+            });
+            const dispPt = toDisplay(points.getPoints()[0]);
+            ctx.lineTo(dispPt.re, dispPt.im);
+            ctx.stroke();
 
-    if(pts.isLoaded()){
-        const timestep = dt / settingsState.substep;
-        if(needsReset){
-            arrows = sines.getArrows(timestamp);
-            trailQueue = Array(settingsState.trailSize).fill(sines.finalPos.add(OFFSET));
+            const timestep = dt / settings.getSubsteps();
+            if(drawingMustReset){
+                arrows = sines.getArrows(timestamp);
+                trailQueue = Array(settings.getTrailSize()).fill(toDisplay(sines.getFinalPos()));
 
-            needsReset = false;
+                drawingMustReset = false;
+            }
+
+            let finalPoint;
+            
+            for(let i = 0; i < settings.getSubsteps(); i++){
+                const tt = timestep * i;
+                arrows = sines.getArrows(timestamp + tt);
+                finalPoint = sines.getFinalPos();
+                trailQueue.shift();
+                trailQueue.push(toDisplay(finalPoint));
+            }
+
+            drawArrows(arrows, toDisplay(finalPoint));
         }
-
-        let drawPoint;
-        
-        for(let i = 0; i < settingsState.substep; i++){
-            const tt = timestep * i;
-            arrows = sines.getArrows(timestamp + tt);
-            drawPoint = sines.finalPos.add(OFFSET);
-            trailQueue.shift();
-            trailQueue.push(drawPoint);
-        }
-
-        drawArrows(arrows, drawPoint);
     }
 
     requestAnimationFrame(mainLoop);
