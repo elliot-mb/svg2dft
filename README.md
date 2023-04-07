@@ -1,5 +1,3 @@
-<img src="https://user-images.githubusercontent.com/45922387/230599416-cece4655-238f-4de3-ad54-fdd3ef653c6d.png" height="600">
-
 # Index
 - [Intro](#svg2dft)
 - [Deployment](#deployment)
