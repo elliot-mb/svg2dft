@@ -12,7 +12,7 @@ The sum of these vectors over time traces the path of the SVG with an accuracy d
 
 ### Motivation
 
-I was motivated to make this project as when I first saw this kind of visualisation. I was shocked as to how elegant the maths was behind such a seemingly complex task. 
+I was motivated to make this project from the moment I first saw this kind of visualisation; I was shocked as to how elegant the maths was behind such a seemingly complex task. 
 Lining up and scaling hundreds and hundreds of little vectors rotating at a constant speed all being done by a single expression/a few lines of code really astounded me. 
 
 For the longest time I had wanted to reproduce what I saw, and was finally motivated to do so when my course covered Fourier Transforms. Finally, I had an excuse!
@@ -32,7 +32,7 @@ A collection of some images that work well, and their respective fourier transfo
 
 <img src="https://user-images.githubusercontent.com/45922387/230635968-bd5d1a9d-bf22-4e96-bdd1-5cd851364d08.svg" height="300">
 
-### Set to 12 points
+#### Set to 12 points
 
 [Screencast from 07-04-23 16:32:58.webm](https://user-images.githubusercontent.com/45922387/230636009-584beb41-7ace-436f-8c1b-b7c39b9b86df.webm)
 
