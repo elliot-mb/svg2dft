@@ -10,16 +10,6 @@ html, body{
 
 a {
     text-decoration:none;
-    color: #fff;
-}
-
-a:hover{
-    color: #f44;
-}
-
-#upload:hover{
-    color: #f44;
-    cursor:pointer;
 }
 
 #centre-absolute{
@@ -30,6 +20,13 @@ a:hover{
     margin: 5.3rem 0.5rem 0.5rem 0.5rem;
     position: absolute;
     z-index: 1;
+}
+
+.ui .list{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 9rem;
 }
 
 .hero{
@@ -45,11 +42,50 @@ a:hover{
 }
 
 .title {
-    margin: 0rem 2rem 0rem 0rem;
+    margin: 0.25rem 2rem 0rem 0rem;
+}
+
+.button{
+    padding: 0.8rem 0.75rem 0.25rem 0.75rem;
+    background:#555;
+    border-radius: 0.5rem;
+    color:#f88;
+    height: 1.75rem;
+    text-align: center;
+}
+
+button {
+    border: none;
+    background:#555;
+    color:#f88;
+    border-radius: 0.5rem;
+}
+
+button:hover {
+    cursor:pointer;
+    color: #f33;
+    background:#444;
+}
+
+.button:hover{
+    color: #f33;
+    cursor:pointer;
+    background:#444;
+}
+
+
+button:active{
+    color: #f00;
+    background:#333;
+}
+
+.button:active{
+    color: #f00;
+    background: #333;
 }
 
 #upload {
-    margin: 0.75rem;
+    text-align: center;
 }
 
 #selected{
@@ -82,6 +118,7 @@ a:hover{
     padding: 0rem 1rem 1rem 1rem;
     background-color: #343434a5;
     border-radius: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .settings .header{
@@ -90,13 +127,9 @@ a:hover{
 }
 
 #close-settings{
-    padding: 1.2rem 0.5rem 0rem 1rem;
+    margin-top: 1rem;
+    padding: 0.3rem 0.8rem 0.5rem 0.9rem;
     font-size: 1.5rem;
-}
-
-#close-settings:hover{
-    color: #f44;
-    cursor:pointer;
 }
 
 .settings .entry{
@@ -119,29 +152,9 @@ a:hover{
     margin-left: 0.25rem;
 }
 
-.ui .open {
-    padding: 1rem 0rem 1rem 0rem;
-    background-color: #343434a5;
-    height: 1.25rem;
-    border-radius: 1rem;
-}
-
-.ui .open:hover{
-    color: #f44;
-    cursor:pointer;
-}
-
-#open-settings{
-    padding: 1rem;
-}
-
 input {
     border: none;
     margin: 0.1rem;
-}
-
-button:hover {
-    cursor:pointer;
 }
 
 input:invalid{
@@ -151,6 +164,8 @@ input:invalid{
 input:invalid + button.update {
     pointer-events:none;
     color: #bcbcbc;
+    background:#abababa5; 
+    /* disabled */
 }
 
 .entry p {

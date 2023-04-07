@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>template</title>
+    <title>SVG2DFT</title>
 
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script src="src/main.js" type="module"></script>
@@ -17,16 +17,16 @@
             <canvas id="canvas" width="1000" height="1000"></canvas>
         </div>
         <div class="hero">
-            <h1 class="title">Drawrier</h1>
-            <span id="upload" onclick="document.getElementById('file-input').click()">Upload file</span>
+            <h1 class="title">SVG2DFT</h1>
+            <span class="button" id="upload" onclick="document.getElementById('file-input').click()">Upload SVG</span>
             <input id="file-input" type="file" name="name" style="display: none;" />
-            <span id="selected">Please upload an SVG file</span>
+            <span id="selected">Upload SVG</span>
         </div>
         <div class="ui">
             <div class="settings" style="display: none;" >
                 <div class="header">
                     <h2>Settings</h2>
-                    <span id="close-settings">x</span>
+                    <span class="button" id="close-settings">x</span>
                 </div>
                 <h3>DFT</h3>
                 <p>
@@ -86,8 +86,9 @@
                     </div>
                 </div>
             </div>
-            <div class="open">
-                <span id="open-settings">Open settings</span>
+            <div class="list">
+                <span class="button" id="open-settings">Open settings</span>
+                <a class="button" id="see-github" href="https://github.com/elliot-mb/svg-dft">See Github</a></span>
             </div>
         </div>
         <div id="input-svg" style="display: none;">
@@ -115,7 +116,7 @@
     </datalist>
 
     <datalist id="defaultOffsets">
-        <option value="800"></option>
+        <option value="500"></option>
     </datalist>
 
     <datalist id="defaultSines">

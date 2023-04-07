@@ -51,14 +51,14 @@ export class UI {
     }
 
     //stateless functions
-    static openSettings(settingsPane, openSettingsPane){
+    static openSettings(settingsPane, openSettingsSpan){
         settingsPane.style = UI.STYLE_SHOWN;
-        openSettingsPane.style = UI.STYLE_HIDDEN;
+        openSettingsSpan.style = UI.STYLE_HIDDEN;
     }
 
-    static closeSettings(settingsPane, openSettingsPane){
+    static closeSettings(settingsPane, openSettingsSpan){
         settingsPane.style = UI.STYLE_HIDDEN;
-        openSettingsPane.style = UI.STYLE_SHOWN;
+        openSettingsSpan.style = UI.STYLE_SHOWN;
     }
 
     static getFirstElementByClassName(parent, name){
@@ -94,9 +94,9 @@ export class UI {
     init(){
         this.zipWidthEventListeners();
 
-        this.openSettingsSpan.addEventListener("click", () => {UI.openSettings(this.settingsPane, this.openSettingsPane);});
+        this.openSettingsSpan.addEventListener("click", () => {UI.openSettings(this.settingsPane, this.openSettingsSpan);});
         
-        this.closeSettingsSpan.addEventListener("click", () => {UI.closeSettings(this.settingsPane, this.openSettingsPane);});
+        this.closeSettingsSpan.addEventListener("click", () => {UI.closeSettings(this.settingsPane, this.openSettingsSpan);});
     }
 
     reset(){

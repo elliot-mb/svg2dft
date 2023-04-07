@@ -119,7 +119,7 @@ state.init();
 function drawArrows(arrows, finalPoint){
     const count = Math.min(arrows.length, settings.getArrowCount());
 
-    ctx.strokeStyle = "#ee2";
+    ctx.strokeStyle = "#afa";
     ctx.lineWidth = 2;
     ctx.beginPath();
     trailQueue.map(pt => {
@@ -144,7 +144,7 @@ function drawArrows(arrows, finalPoint){
 
     //draws spinny vectors
     ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     pos = new Complex();
     for(let i = 0; i < count; i++){
@@ -183,13 +183,8 @@ function mainLoop(timestamp){
         ctx.fillStyle = "#000";
         ctx.fillRect(0,0,1000,1000);
 
-        // points.getPoints().map((pt) => {
-        //     ctx.fillStyle = "#131";
-        //     ctx.fillRect(pt.re - 4, pt.im - 4, 8, 8);
-        // });
-
         if(points.isLoaded()){
-            ctx.strokeStyle = "#818";
+            ctx.strokeStyle = "#050";
             ctx.lineWidth = 2;
             ctx.beginPath();
             points.getPoints().map((pt) => {
@@ -199,6 +194,12 @@ function mainLoop(timestamp){
             const dispPt = toDisplay(points.getPoints()[0]);
             ctx.lineTo(dispPt.re, dispPt.im);
             ctx.stroke();
+
+            points.getPoints().map((pt) => {
+                ctx.fillStyle = "#077";
+                const dispPt = toDisplay(pt);
+                ctx.fillRect(dispPt.re - 4, dispPt.im - 4, 8, 8);
+            });
 
             const timestep = dt / settings.getSubsteps();
             if(drawingMustReset){
