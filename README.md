@@ -1,3 +1,6 @@
+![image](https://user-images.githubusercontent.com/45922387/230599416-cece4655-238f-4de3-ad54-fdd3ef653c6d.png)
+
+
 # SVG2DFT
 
 App that draws SVGs' paths by converting them to a set of points on the complex plane, then applying a Discrete Fourier transform to generate a set of rotating vectors.
