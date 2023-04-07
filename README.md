@@ -25,23 +25,27 @@ In the future I may put in place an algorithm which smooths out these jumps.
 
 ## Gallery 
 
-A collection of some images that work well, and their respective fourier transforms. 
+A collection of some images that work well, and their respective fourier transforms. Feel free to download these SVGs and play with the settings yourself!
+
+<img src="https://user-images.githubusercontent.com/45922387/230632956-b391799c-9513-47b9-ac73-265e0bacaf2a.svg" height="300">
 
 #### 250 points
 
-<img src="https://user-images.githubusercontent.com/45922387/230632956-b391799c-9513-47b9-ac73-265e0bacaf2a.svg" width="200">
-
 [Screencast from 07-04-23 16:12:46.webm](https://user-images.githubusercontent.com/45922387/230633470-272ff7df-1494-4e80-866a-1c954459941c.webm)
+
+---
+
+<img src="https://user-images.githubusercontent.com/45922387/230633668-ad496b12-93af-48dc-9110-2c2086e5fe17.svg" height="400">
 
 #### 251 points 
 
-<img src="https://user-images.githubusercontent.com/45922387/230633668-ad496b12-93af-48dc-9110-2c2086e5fe17.svg" width="200">
-
 [Screencast from 07-04-23 16:07:29.webm](https://user-images.githubusercontent.com/45922387/230633645-ede9d433-f3ad-4fe5-a629-54ce75d7b135.webm)
 
-#### 1000 points
+---
 
-<img src="https://user-images.githubusercontent.com/45922387/230633796-e4d2d081-26e8-4fa8-bedb-d75b4df2fa08.svg" width="200">
+<img src="https://user-images.githubusercontent.com/45922387/230633796-e4d2d081-26e8-4fa8-bedb-d75b4df2fa08.svg" height="300">
+
+#### 1000 points
 
 [Screencast from 07-04-23 16:03:16.webm](https://user-images.githubusercontent.com/45922387/230633843-15b73d06-1c3f-4006-bbea-8c4647a3b26f.webm)
 
