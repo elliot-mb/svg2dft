@@ -7,7 +7,6 @@ The sum of these vectors over time traces the path of the SVG with an accuracy d
 ### Motivation
 
 I was motivated to make this project as when I first saw this kind of visualisation. I was shocked as to how elegant the maths was behind such a seemingly complex task. 
-
 Lining up and scaling hundreds and hundreds of little vectors rotating at a constant speed all being done by a single expression/a few lines of code really astounded me. 
 
 For the longest time I had wanted to reproduce what I saw, and was finally motivated to do so when my course covered Fourier Transforms. Finally, I had an excuse!
