@@ -27,6 +27,14 @@ In the future I may put in place an algorithm which smooths out these jumps.
 
 A collection of some images that work well, and their respective fourier transforms. Feel free to download these SVGs and play with the settings yourself!
 
+<img src="https://user-images.githubusercontent.com/45922387/230635968-bd5d1a9d-bf22-4e96-bdd1-5cd851364d08.svg" height="300">
+
+### 12 points
+
+[Screencast from 07-04-23 16:32:58.webm](https://user-images.githubusercontent.com/45922387/230636009-584beb41-7ace-436f-8c1b-b7c39b9b86df.webm)
+
+---
+
 <img src="https://user-images.githubusercontent.com/45922387/230632956-b391799c-9513-47b9-ac73-265e0bacaf2a.svg" height="300">
 
 #### 250 points
