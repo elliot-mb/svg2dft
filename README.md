@@ -15,4 +15,7 @@ For the longest time I had wanted to reproduce what I saw, and was finally motiv
 
 Please visit the deployed application [here](https://pi.elliotmb.dev/static/project/svg-dft).
 
-The program allows you to experiment with the parameters of the DFT and the visualisation.
+The program allows you to upload your own SVGs, experiment with the parameters of the DFT and the visualisation. 
+
+It has to be said it works best on simple SVGs with a low/single path count, else many discontinuities arise and the transform begins looking messy. \
+In the future I may put in place an algorithm which smooths out these jumps.
